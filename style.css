@@ -1,0 +1,595 @@
+:root {
+  /* Fusión Paleta 1 (Editorial/Artesanal) + Paleta 3 (Dark Mode Gourmet) */
+  --bg-dark: #141414;
+  --bg-dark-elevated: #1F2421;
+  --bg-cream: #FAF7F2;
+  --bg-card: #FFFFFF;
+  --text-main: #1F2421;
+  --text-muted: #5C635E;
+  --text-light: #F5F5F5;
+  --accent-terracotta: #D95D39;
+  --accent-terracotta-hover: #B84A2A;
+  --border-subtle: #E2DDD5;
+  --status-pending: #E09F3E;
+  --status-packing: #2A6F97;
+  --status-shipped: #5F7161;
+  --status-delivered: #2B9348;
+  --shadow-sm: 0 2px 8px rgba(20, 20, 20, 0.06);
+  --shadow-md: 0 8px 24px rgba(20, 20, 20, 0.12);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+body {
+  background-color: var(--bg-cream);
+  color: var(--text-main);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* HEADER DARK MODE GOURMET */
+header {
+  background-color: var(--bg-dark);
+  color: var(--text-light);
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 3px solid var(--accent-terracotta);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-logo {
+  font-family: Georgia, serif;
+  font-size: 1.5rem;
+  font-weight: bold;
+  letter-spacing: 1px;
+  color: var(--text-light);
+}
+
+.brand-badge {
+  background-color: var(--bg-dark-elevated);
+  color: #D4A373;
+  font-size: 0.75rem;
+  padding: 4px 10px;
+  border-radius: 20px;
+  border: 1px solid #333;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.user-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.header-user-name {
+  font-size: 0.85rem;
+  color: #CCC;
+}
+
+.sede-pill {
+  background-color: var(--accent-terracotta);
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+/* BOTONES */
+.btn {
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.btn-primary {
+  background-color: var(--accent-terracotta);
+  color: #FFFFFF;
+}
+
+.btn-primary:hover {
+  background-color: var(--accent-terracotta-hover);
+}
+
+.btn-secondary {
+  background-color: var(--bg-dark-elevated);
+  color: var(--text-light);
+}
+
+.btn-secondary:hover {
+  background-color: #2E3531;
+}
+
+.btn-outline {
+  background-color: transparent;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-main);
+}
+
+.btn-outline:hover {
+  background-color: #EFEAE1;
+}
+
+.btn-sm {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.8rem;
+}
+
+.btn-full {
+  width: 100%;
+}
+
+.btn-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-remove {
+  color: #C1121F;
+}
+
+/* CONTENEDOR PRINCIPAL */
+main {
+  flex: 1;
+  max-width: 1280px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* VISTA LOGIN */
+.login-wrapper {
+  max-width: 480px;
+  margin: 2rem auto;
+  background: var(--bg-card);
+  border-radius: 12px;
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  border: 1px solid var(--border-subtle);
+}
+
+.login-header {
+  background: var(--bg-dark);
+  color: var(--text-light);
+  padding: 2rem;
+  text-align: center;
+}
+
+.login-header h1 {
+  font-family: Georgia, serif;
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
+}
+
+.login-header p {
+  font-size: 0.9rem;
+  color: #B0B5B2;
+}
+
+.login-body {
+  padding: 2rem;
+}
+
+.login-error {
+  color: #C1121F;
+  font-size: 0.85rem;
+  margin-bottom: 1rem;
+}
+
+.form-group {
+  margin-bottom: 1.2rem;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+  color: var(--text-main);
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.7rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  font-size: 0.95rem;
+  background-color: #FAF9F6;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--accent-terracotta);
+  background-color: #FFF;
+}
+
+.search-input {
+  max-width: 240px;
+  padding: 0.4rem 0.7rem;
+}
+
+.status-select {
+  width: auto;
+  padding: 0.3rem;
+  font-size: 0.8rem;
+}
+
+.demo-credentials {
+  margin-top: 1.5rem;
+  padding-top: 1.2rem;
+  border-top: 1px dashed var(--border-subtle);
+}
+
+.demo-credentials p {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 0.6rem;
+  font-weight: 600;
+}
+
+.demo-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+/* NAVEGACIÓN POR PESTAÑAS */
+.tabs {
+  display: flex;
+  gap: 1rem;
+  border-bottom: 2px solid var(--border-subtle);
+  margin-bottom: 1.5rem;
+}
+
+.tab-btn {
+  padding: 0.75rem 1.2rem;
+  background: none;
+  border: none;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  font-size: 0.95rem;
+}
+
+.tab-btn.active {
+  color: var(--accent-terracotta);
+  border-bottom-color: var(--accent-terracotta);
+}
+
+/* LAYOUT DE CATÁLOGO Y CARRITO (SUCURSAL) */
+.sucursal-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .sucursal-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.card {
+  background: var(--bg-card);
+  border-radius: 10px;
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-sm);
+  padding: 1.5rem;
+}
+
+.card-title {
+  font-family: Georgia, serif;
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.subtitle-muted {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.report-description {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+}
+
+/* TABLAS */
+.table-responsive {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 0.85rem 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border-subtle);
+  font-size: 0.9rem;
+}
+
+th {
+  background-color: #F4F0E8;
+  font-weight: 700;
+  color: var(--text-main);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.qty-input {
+  width: 75px;
+  padding: 0.4rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  text-align: center;
+}
+
+.status-available {
+  color: #2B9348;
+  font-weight: 600;
+}
+
+.status-unavailable {
+  color: #C1121F;
+  font-weight: 600;
+}
+
+.sede-highlight {
+  font-weight: 700;
+  color: var(--accent-terracotta);
+}
+
+.logistics-actions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+/* BADGES DE ESTATUS */
+.badge {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #FFF;
+  display: inline-block;
+}
+
+.badge-pendiente { background-color: var(--status-pending); color: #141414; }
+.badge-empaque { background-color: var(--status-packing); }
+.badge-enviado { background-color: var(--status-shipped); }
+.badge-entregado { background-color: var(--status-delivered); }
+
+/* CARRITO */
+.cart-sede-tag {
+  font-size: 0.8rem;
+  color: var(--accent-terracotta);
+  font-weight: 700;
+}
+
+.cart-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px dashed var(--border-subtle);
+}
+
+.cart-item-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.cart-item-meta {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.cart-empty {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.cart-footer {
+  margin-top: 1.5rem;
+}
+
+/* FILTROS ALMACÉN */
+.filter-bar {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.filter-chip {
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-card);
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.filter-chip.active {
+  background: var(--bg-dark);
+  color: var(--text-light);
+  border-color: var(--bg-dark);
+}
+
+/* MODAL PARA ORDEN DE SURTIDO (PICKING LIST) */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 20, 20, 0.7);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.modal-backdrop.open {
+  display: flex;
+}
+
+.modal-content {
+  background: #FFF;
+  max-width: 650px;
+  width: 100%;
+  border-radius: 10px;
+  padding: 2rem;
+  box-shadow: var(--shadow-md);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.serif-title {
+  font-family: Georgia, serif;
+}
+
+.picking-header {
+  border-bottom: 2px solid var(--bg-dark);
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.picking-subtitle {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+}
+
+.picking-main-title {
+  margin: 4px 0;
+}
+
+.picking-meta {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.picking-sede-wrapper {
+  text-align: right;
+}
+
+.picking-sede-box {
+  background: var(--bg-dark);
+  color: #FFF;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  display: inline-block;
+}
+
+.picking-table {
+  margin-bottom: 1.2rem;
+}
+
+.picking-notes {
+  font-size: 0.85rem;
+  background: #F4F0E8;
+  padding: 0.7rem;
+  border-radius: 6px;
+  margin-bottom: 1.5rem;
+}
+
+.confirm-sede-subtitle {
+  color: var(--accent-terracotta);
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.confirm-summary-list {
+  margin-bottom: 1.5rem;
+}
+
+.modal-actions-end {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.modal-actions-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.alert-box {
+  background-color: #FDF3EF;
+  border-left: 4px solid var(--accent-terracotta);
+  padding: 0.85rem 1rem;
+  margin-bottom: 1.2rem;
+  font-size: 0.85rem;
+  color: var(--text-main);
+}
+
+footer {
+  background-color: var(--bg-dark);
+  color: #8E9490;
+  text-align: center;
+  padding: 1rem;
+  font-size: 0.8rem;
+  margin-top: auto;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* ESTILOS DE IMPRESIÓN PARA LISTA DE PICKING */
+@media print {
+  body * { visibility: hidden; }
+  #pickingModal, #pickingModal * { visibility: visible; }
+  #pickingModal {
+    position: absolute;
+    left: 0;
+    top: 0;
+    background: #FFF;
+    padding: 0;
+  }
+  .no-print { display: none !important; }
+}

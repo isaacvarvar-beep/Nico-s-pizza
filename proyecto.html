@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nico's Pizza | Sistema Multisucursal de Gestión y Segmentación de Pedidos</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ENCABEZADO -->
+  <header>
+    <div class="brand">
+      <span class="brand-logo">NICO'S PIZZA</span>
+      <span class="brand-badge">Abastecimiento Multisucursal</span>
+    </div>
+    <div id="userHeaderControls" class="user-controls hidden">
+      <span id="headerUserName" class="header-user-name"></span>
+      <span id="headerSedeBadge" class="sede-pill"></span>
+      <button class="btn btn-secondary btn-sm" onclick="logout()">Cerrar Sesión</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- 1. MÓDULO DE AUTENTICACIÓN Y ROLES (ID_Sucursal FIJO) -->
+    <section id="loginView" class="login-wrapper">
+      <div class="login-header">
+        <h1>Portal de Insumos</h1>
+        <p>Acceso exclusivo por sede operativa y almacén central</p>
+      </div>
+      <div class="login-body">
+        <div class="alert-box">
+          <strong>Seguridad por Rol:</strong> Tu sesión asignará automáticamente tu clave única <code>ID_Sucursal</code> sin posibilidad de cruce de órdenes.
+        </div>
+        <form id="loginForm" onsubmit="handleLogin(event)">
+          <div class="form-group">
+            <label for="username">Usuario Institucional</label>
+            <input type="text" id="username" class="form-control" placeholder="Ej. suc_centro" required>
+          </div>
+          <div class="form-group">
+            <label for="password">Contraseña</label>
+            <input type="password" id="password" class="form-control" placeholder="••••••••" required>
+          </div>
+          <p id="loginError" class="login-error hidden">Credenciales inválidas.</p>
+          <button type="submit" class="btn btn-primary btn-full">Ingresar al Sistema</button>
+        </form>
+
+        <div class="demo-credentials">
+          <p>Accesos Rápidos de Prueba (Perfiles Fijos):</p>
+          <div class="demo-grid">
+            <button type="button" class="btn btn-outline btn-sm" onclick="quickLogin('suc_centro', '1234')">📍 Sucursal Centro</button>
+            <button type="button" class="btn btn-outline btn-sm" onclick="quickLogin('suc_norte', '1234')">📍 Sucursal Norte</button>
+            <button type="button" class="btn btn-outline btn-sm" onclick="quickLogin('suc_sur', '1234')">📍 Sucursal Sur</button>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="quickLogin('almacen', '1234')">🏭 Almacén Central</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. VISTA SUCURSAL (ENCARGADO DE RESTAURANTE) -->
+    <section id="sucursalView" class="hidden">
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchSucursalTab('nuevoPedido', this)">📦 Nuevo Pedido de Insumos</button>
+        <button class="tab-btn" onclick="switchSucursalTab('historialSucursal', this)">🕒 Historial y Estatus de Mi Sede</button>
+      </div>
+
+      <!-- TAB: NUEVO PEDIDO -->
+      <div id="tabNuevoPedido" class="sucursal-grid">
+        <div class="card">
+          <div class="card-title">
+            <span>Catálogo Maestro de Insumos</span>
+            <input type="text" id="searchInsumo" class="form-control search-input" placeholder="Buscar insumo o clave..." onkeyup="renderCatalog()">
+          </div>
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Clave</th>
+                  <th>Insumo</th>
+                  <th>Categoría</th>
+                  <th>Unidad</th>
+                  <th>Disponibilidad</th>
+                  <th>Cantidad</th>
+                  <th>Acción</th>
+                </tr>
+              </thead>
+              <tbody id="catalogTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- CARRITO DE PEDIDO -->
+        <div class="card">
+          <div class="card-title">
+            <span>Orden de Compra</span>
+            <span id="cartSedeTag" class="cart-sede-tag"></span>
+          </div>
+          <div id="cartItemsContainer"></div>
+          <div id="cartFooter" class="cart-footer hidden">
+            <div class="form-group">
+              <label for="orderNotes">Observaciones de entrega (opcional)</label>
+              <input type="text" id="orderNotes" class="form-control" placeholder="Ej. Entregar antes de las 11:00 AM">
+            </div>
+            <button class="btn btn-primary btn-full" onclick="openConfirmOrderModal()">Revisar y Confirmar Pedido</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: HISTORIAL DE SUCURSAL -->
+      <div id="tabHistorialSucursal" class="card hidden">
+        <div class="card-title">
+          <span>Historial de Pedidos Solicitados</span>
+          <span class="subtitle-muted">Aislamiento estricto por ID_Sucursal</span>
+        </div>
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Folio Orden</th>
+                <th>Fecha y Hora</th>
+                <th>Total Insumos</th>
+                <th>Detalle</th>
+                <th>Estatus Actual</th>
+                <th>Acción</th>
+              </tr>
+            </thead>
+            <tbody id="sucursalOrdersBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. VISTA ALMACÉN CENTRAL (CENTRO DE DISTRIBUCIÓN) -->
+    <section id="almacenView" class="hidden">
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchAlmacenTab('consolaPicking', this)">🏭 Consola Logística y Picking por Sede</button>
+        <button class="tab-btn" onclick="switchAlmacenTab('reportesAuditoria', this)">📊 Reportes de Insumos y Auditoría</button>
+      </div>
+
+      <!-- TAB: CONSOLA DE PICKING -->
+      <div id="tabConsolaPicking" class="card">
+        <div class="card-title">
+          <span>Órdenes Segmentadas por Sucursal</span>
+          <button class="btn btn-outline btn-sm" onclick="resetDemoData()">Restaurar Datos Demo</button>
+        </div>
+
+        <div class="filter-bar">
+          <button class="filter-chip active" onclick="filterAlmacenOrders('ALL', this)">Todas las Sedes</button>
+          <button class="filter-chip" onclick="filterAlmacenOrders('SUC-01', this)">📍 Sucursal Centro (SUC-01)</button>
+          <button class="filter-chip" onclick="filterAlmacenOrders('SUC-02', this)">📍 Sucursal Norte (SUC-02)</button>
+          <button class="filter-chip" onclick="filterAlmacenOrders('SUC-03', this)">📍 Sucursal Sur (SUC-03)</button>
+        </div>
+
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Folio</th>
+                <th>ID_Sucursal / Sede</th>
+                <th>Fecha Solicitud</th>
+                <th>Ítems</th>
+                <th>Estatus</th>
+                <th>Gestión Logística</th>
+              </tr>
+            </thead>
+            <tbody id="almacenOrdersBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TAB: REPORTES Y AUDITORÍA -->
+      <div id="tabReportesAuditoria" class="card hidden">
+        <div class="card-title">
+          <span>Reporte Consolidado de Insumos Solicitados por Sucursal</span>
+        </div>
+        <p class="report-description">
+          Resumen acumulado para control de mermas, costos e inventario individualizado por tienda.
+        </p>
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Sucursal</th>
+                <th>Órdenes Realizadas</th>
+                <th>Unidades Totales Solicitadas</th>
+                <th>Desglose de Insumos Principales</th>
+              </tr>
+            </thead>
+            <tbody id="auditReportBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- MODAL CONFIRMACIÓN DE PEDIDO (SUCURSAL) -->
+  <div id="confirmOrderModal" class="modal-backdrop">
+    <div class="modal-content">
+      <div class="picking-header">
+        <div>
+          <h2 class="serif-title">Resumen de Orden de Abastecimiento</h2>
+          <p id="confirmSedeSubtitle" class="confirm-sede-subtitle"></p>
+        </div>
+      </div>
+      <div id="confirmSummaryList" class="confirm-summary-list"></div>
+      <div class="modal-actions-end">
+        <button class="btn btn-outline" onclick="closeModal('confirmOrderModal')">Cancelar</button>
+        <button class="btn btn-primary" onclick="submitOrder()">Enviar Pedido a Almacén Central</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL LISTA DE PICKING / ORDEN DE SURTIDO (ALMACÉN Y DETALLE) -->
+  <div id="pickingModal" class="modal-backdrop">
+    <div class="modal-content">
+      <div class="picking-header">
+        <div>
+          <span class="picking-subtitle">Centro de Distribución Nico's Pizza</span>
+          <h2 class="serif-title picking-main-title">ORDEN DE SURTIDO (PICKING LIST)</h2>
+          <p id="pickingOrderMeta" class="picking-meta"></p>
+        </div>
+        <div class="picking-sede-wrapper">
+          <span id="pickingSedeBox" class="picking-sede-box"></span>
+        </div>
+      </div>
+
+      <table class="picking-table">
+        <thead>
+          <tr>
+            <th>Clave</th>
+            <th>Descripción del Insumo</th>
+            <th>Unidad</th>
+            <th>Cantidad</th>
+            <th class="no-print">Verificado</th>
+          </tr>
+        </thead>
+        <tbody id="pickingTableBody"></tbody>
+      </table>
+
+      <p id="pickingNotesText" class="picking-notes"></p>
+
+      <div class="no-print modal-actions-between">
+        <button class="btn btn-secondary" onclick="window.print()">🖨️ Imprimir / Exportar Orden</button>
+        <button class="btn btn-outline" onclick="closeModal('pickingModal')">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    Nico's Pizza — Sistema Web Multisucursal de Gestión y Segmentación de Pedidos de Insumos (ID_Sucursal)
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

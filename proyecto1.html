@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nico's Pizza | Sistema Multisucursal de Gestión y Segmentación de Pedidos</title>
+  <link rel="stylesheet" href="style1.css">
+</head>
+<body>
+
+  <!-- ENCABEZADO -->
+  <header>
+    <div class="brand">
+      <span class="brand-logo">NICO'S PIZZA</span>
+      <span class="brand-badge">Abastecimiento Multisucursal</span>
+    </div>
+    <div id="userHeaderControls" class="user-controls hidden">
+      <span id="headerUserName" class="header-user-name"></span>
+      <span id="headerSedeBadge" class="sede-pill"></span>
+      <button class="btn btn-secondary btn-sm" onclick="logout()">Cerrar Sesión</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- 1. MÓDULO DE AUTENTICACIÓN Y REGISTRO (ID_Sucursal FIJO) -->
+    <section id="authView" class="login-wrapper">
+      <div class="login-header">
+        <h1>Portal de Insumos</h1>
+        <p>Gestión y segmentación de pedidos por sede</p>
+      </div>
+
+      <!-- PESTAÑAS LOGIN / REGISTRO -->
+      <div class="auth-tabs">
+        <button type="button" id="tabBtnLogin" class="auth-tab-btn active" onclick="switchAuthMode('login')">Iniciar Sesión</button>
+        <button type="button" id="tabBtnRegister" class="auth-tab-btn" onclick="switchAuthMode('register')">Registrarse</button>
+      </div>
+
+      <div class="login-body">
+        <!-- FORMULARIO DE INICIO DE SESIÓN -->
+        <div id="loginPanel">
+          <form id="loginForm" onsubmit="handleLogin(event)">
+            <div class="form-group">
+              <label for="loginUsername">Usuario</label>
+              <input type="text" id="loginUsername" class="form-control" placeholder="Ingresa tu usuario registrado" required>
+            </div>
+            <div class="form-group">
+              <label for="loginPassword">Contraseña</label>
+              <input type="password" id="loginPassword" class="form-control" placeholder="••••••••" required>
+            </div>
+            <p id="loginError" class="auth-msg-error hidden">Usuario o contraseña incorrectos.</p>
+            <p id="registerSuccessMsg" class="auth-msg-success hidden">¡Cuenta creada! Ya puedes iniciar sesión.</p>
+            <button type="submit" class="btn btn-primary btn-full">Ingresar al Sistema</button>
+          </form>
+          <p class="auth-switch-hint">
+            ¿Aún no tienes cuenta? <a href="#" onclick="switchAuthMode('register'); return false;">Registra tu usuario aquí</a>
+          </p>
+        </div>
+
+        <!-- FORMULARIO DE REGISTRO -->
+        <div id="registerPanel" class="hidden">
+          <div class="alert-box">
+            <strong>Asignación de Sede:</strong> La sucursal que elijas al registrarte quedará vinculada de forma permanente a tu usuario (<code>ID_Sucursal</code>).
+          </div>
+          <form id="registerForm" onsubmit="handleRegister(event)">
+            <div class="form-group">
+              <label for="regFullName">Nombre Completo del Encargado / Personal</label>
+              <input type="text" id="regFullName" class="form-control" placeholder="Ej. Carlos Méndez" required>
+            </div>
+            <div class="form-group">
+              <label for="regUsername">Nombre de Usuario (para iniciar sesión)</label>
+              <input type="text" id="regUsername" class="form-control" placeholder="Ej. carlos_centro" required>
+            </div>
+            <div class="form-group">
+              <label for="regSede">Sede Operativa / Área Asignada</label>
+              <select id="regSede" class="form-control" required>
+                <option value="" disabled selected>Selecciona tu sucursal o almacén...</option>
+                <option value="SUC-01">📍 Sucursal Centro (SUC-01)</option>
+                <option value="SUC-02">📍 Sucursal Norte (SUC-02)</option>
+                <option value="SUC-03">📍 Sucursal Sur (SUC-03)</option>
+                <option value="ALM-00">🏭 Almacén Central / Logística (ALM-00)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="regPassword">Contraseña</label>
+              <input type="password" id="regPassword" class="form-control" placeholder="Crea una contraseña (mín. 4 caracteres)" minlength="4" required>
+            </div>
+            <p id="registerError" class="auth-msg-error hidden">Ese nombre de usuario ya está registrado. Elige otro.</p>
+            <button type="submit" class="btn btn-primary btn-full">Guardar Registro</button>
+          </form>
+          <p class="auth-switch-hint">
+            ¿Ya tienes cuenta? <a href="#" onclick="switchAuthMode('login'); return false;">Inicia sesión aquí</a>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. VISTA SUCURSAL (ENCARGADO DE RESTAURANTE) -->
+    <section id="sucursalView" class="hidden">
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchSucursalTab('nuevoPedido', this)">📦 Nuevo Pedido de Insumos</button>
+        <button class="tab-btn" onclick="switchSucursalTab('historialSucursal', this)">🕒 Historial y Estatus de Mi Sede</button>
+      </div>
+
+      <!-- TAB: NUEVO PEDIDO -->
+      <div id="tabNuevoPedido" class="sucursal-grid">
+        <div class="card">
+          <div class="card-title">
+            <span>Catálogo Maestro de Insumos</span>
+            <input type="text" id="searchInsumo" class="form-control search-input" placeholder="Buscar insumo o clave..." onkeyup="renderCatalog()">
+          </div>
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Clave</th>
+                  <th>Insumo</th>
+                  <th>Categoría</th>
+                  <th>Unidad</th>
+                  <th>Disponibilidad</th>
+                  <th>Cantidad</th>
+                  <th>Acción</th>
+                </tr>
+              </thead>
+              <tbody id="catalogTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- CARRITO DE PEDIDO -->
+        <div class="card">
+          <div class="card-title">
+            <span>Orden de Compra</span>
+            <span id="cartSedeTag" class="cart-sede-tag"></span>
+          </div>
+          <div id="cartItemsContainer"></div>
+          <div id="cartFooter" class="cart-footer hidden">
+            <div class="form-group">
+              <label for="orderNotes">Observaciones de entrega (opcional)</label>
+              <input type="text" id="orderNotes" class="form-control" placeholder="Ej. Entregar antes de las 11:00 AM">
+            </div>
+            <button class="btn btn-primary btn-full" onclick="openConfirmOrderModal()">Revisar y Confirmar Pedido</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: HISTORIAL DE SUCURSAL -->
+      <div id="tabHistorialSucursal" class="card hidden">
+        <div class="card-title">
+          <span>Historial de Pedidos Solicitados</span>
+          <span class="subtitle-muted">Aislamiento estricto por ID_Sucursal</span>
+        </div>
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Folio Orden</th>
+                <th>Fecha y Hora</th>
+                <th>Total Insumos</th>
+                <th>Detalle</th>
+                <th>Estatus Actual</th>
+                <th>Acción</th>
+              </tr>
+            </thead>
+            <tbody id="sucursalOrdersBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. VISTA ALMACÉN CENTRAL (CENTRO DE DISTRIBUCIÓN) -->
+    <section id="almacenView" class="hidden">
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchAlmacenTab('consolaPicking', this)">🏭 Consola Logística y Picking por Sede</button>
+        <button class="tab-btn" onclick="switchAlmacenTab('reportesAuditoria', this)">📊 Reportes de Insumos y Auditoría</button>
+      </div>
+
+      <!-- TAB: CONSOLA DE PICKING -->
+      <div id="tabConsolaPicking" class="card">
+        <div class="card-title">
+          <span>Órdenes Segmentadas por Sucursal</span>
+          <button class="btn btn-outline btn-sm" onclick="resetDemoData()">Restaurar Órdenes Demo</button>
+        </div>
+
+        <div class="filter-bar">
+          <button class="filter-chip active" onclick="filterAlmacenOrders('ALL', this)">Todas las Sedes</button>
+          <button class="filter-chip" onclick="filterAlmacenOrders('SUC-01', this)">📍 Sucursal Centro (SUC-01)</button>
+          <button class="filter-chip" onclick="filterAlmacenOrders('SUC-02', this)">📍 Sucursal Norte (SUC-02)</button>
+          <button class="filter-chip" onclick="filterAlmacenOrders('SUC-03', this)">📍 Sucursal Sur (SUC-03)</button>
+        </div>
+
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Folio</th>
+                <th>ID_Sucursal / Sede</th>
+                <th>Fecha Solicitud</th>
+                <th>Ítems</th>
+                <th>Estatus</th>
+                <th>Gestión Logística</th>
+              </tr>
+            </thead>
+            <tbody id="almacenOrdersBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TAB: REPORTES Y AUDITORÍA -->
+      <div id="tabReportesAuditoria" class="card hidden">
+        <div class="card-title">
+          <span>Reporte Consolidado de Insumos Solicitados por Sucursal</span>
+        </div>
+        <p class="report-description">
+          Resumen acumulado para control de mermas, costos e inventario individualizado por tienda.
+        </p>
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Sucursal</th>
+                <th>Órdenes Realizadas</th>
+                <th>Unidades Totales Solicitadas</th>
+                <th>Desglose de Insumos Principales</th>
+              </tr>
+            </thead>
+            <tbody id="auditReportBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- MODAL CONFIRMACIÓN DE PEDIDO (SUCURSAL) -->
+  <div id="confirmOrderModal" class="modal-backdrop">
+    <div class="modal-content">
+      <div class="picking-header">
+        <div>
+          <h2 class="serif-title">Resumen de Orden de Abastecimiento</h2>
+          <p id="confirmSedeSubtitle" class="confirm-sede-subtitle"></p>
+        </div>
+      </div>
+      <div id="confirmSummaryList" class="confirm-summary-list"></div>
+      <div class="modal-actions-end">
+        <button class="btn btn-outline" onclick="closeModal('confirmOrderModal')">Cancelar</button>
+        <button class="btn btn-primary" onclick="submitOrder()">Enviar Pedido a Almacén Central</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL LISTA DE PICKING / ORDEN DE SURTIDO (ALMACÉN Y DETALLE) -->
+  <div id="pickingModal" class="modal-backdrop">
+    <div class="modal-content">
+      <div class="picking-header">
+        <div>
+          <span class="picking-subtitle">Centro de Distribución Nico's Pizza</span>
+          <h2 class="serif-title picking-main-title">ORDEN DE SURTIDO (PICKING LIST)</h2>
+          <p id="pickingOrderMeta" class="picking-meta"></p>
+        </div>
+        <div class="picking-sede-wrapper">
+          <span id="pickingSedeBox" class="picking-sede-box"></span>
+        </div>
+      </div>
+
+      <table class="picking-table">
+        <thead>
+          <tr>
+            <th>Clave</th>
+            <th>Descripción del Insumo</th>
+            <th>Unidad</th>
+            <th>Cantidad</th>
+            <th class="no-print">Verificado</th>
+          </tr>
+        </thead>
+        <tbody id="pickingTableBody"></tbody>
+      </table>
+
+      <p id="pickingNotesText" class="picking-notes"></p>
+
+      <div class="no-print modal-actions-between">
+        <button class="btn btn-secondary" onclick="window.print()">🖨️ Imprimir / Exportar Orden</button>
+        <button class="btn btn-outline" onclick="closeModal('pickingModal')">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    Nico's Pizza — Sistema Web Multisucursal de Gestión y Segmentación de Pedidos de Insumos (ID_Sucursal)
+  </footer>
+
+  <script src="script1.js"></script>
+</body>
+</html>
